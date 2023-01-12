@@ -492,7 +492,8 @@ getgenv().kocmoc = {
         usegumdropsforquest = false,
         autox4 = false,
         newtokencollection = false,
-        gpusaver = false
+        gpusaver = false,
+        cpusaver = false
     },
     vars = {
         field = "Ant Field",
@@ -1324,8 +1325,8 @@ function getsparkles()
             api.humanoidrootpart().CFrame = CFrame.new(v.Parent.Position)
             task.wait(.5)
             repeat
-                farm(v)
-            until not api.isExist(v)
+                farm(v.Parent)
+            until not api.isExist(v.Parent)
             enableall()
             api.tween(2, fieldpos)
         else
@@ -2253,6 +2254,16 @@ guiElements["toggles"]["enablestatuspanel"] = information:CreateToggle("Status P
         end
     end
 end)
+
+local disableenable = hometab:CreateSection("Disable all or Enable all")
+disableenable:CreateButton("Disable All Functions", function()
+    disableall()
+end):AddToolTip("It will disable all the functions in your script")
+
+disableenable:CreateButton("Enable All Functions Back", function()
+    enableall()
+end):AddToolTip("It will enable all the functions you were using before in your script")
+
 local farmo = farmtab:CreateSection("Farming")
 local fielddropdown = farmo:CreateDropdown("Field", fieldstable, function(String)
     kocmoc.vars.field = String
@@ -2569,16 +2580,6 @@ amks:CreateButton("Kill Mobs", function()
     temptable.started.monsters = false
 end)
 
-local disableenable = misctab:CreateSection("Disable all or Enable all")
-disableenable:CreateButton("Disable All Functions", function()
-    disableall()
-end):AddToolTip("It will disable all the functions in your script")
-
-disableenable:CreateButton("Enable All Functions Back", function()
-    enableall()
-end):AddToolTip("It will enable all the functions you were using before in your script")
-
-
 local wayp = misctab:CreateSection("Waypoints")
 wayp:CreateDropdown("Field Teleports", fieldstable, function(Option)
     api.humanoidrootpart().CFrame = game.Workspace.FlowerZones:FindFirstChild(Option).CFrame
@@ -2640,8 +2641,11 @@ miscc:CreateButton("Ant Challenge Semi-Godmode", function()
     task.wait(8)
     api.tween(1, CFrame.new(93.4228, 32.3983, 553.128))
 end)
-local gpusave = miscc:CreateToggle('GPU, CPU Saver', nil, function(State) --Sakata
+--[[ local gpusave = miscc:CreateToggle('GPU, CPU Saver', nil, function(State) --Sakata
     kocmoc.toggles.gpusaver = State
+end) ]]
+local cpusave = miscc:CreateToggle("CPU / GPU Saver", nil, function(State)
+    kocmoc.toggles.cpusaver = State
 end)
 local wstoggle = miscc:CreateToggle("Walk Speed", nil, function(State)
     kocmoc.toggles.loopspeed = State
@@ -3992,6 +3996,32 @@ task.spawn(function()
                 end
             end
         end
+        if kocmoc.toggles.cpusaver then
+            local InputService = game:GetService'UserInputService'
+            local RunService = game:GetService'RunService'
+            _TARGETFPS = 20
+        
+            local OldLevel = settings().Rendering.QualityLevel
+            RunService:Set3dRenderingEnabled(false)
+            
+            settings().Rendering.QualityLevel = 1
+        
+            InputService.WindowFocused:Connect(function()
+                RunService:Set3dRenderingEnabled(true)
+                settings().Rendering.QualityLevel = OldLevel
+                setfpscap(60)
+            end)
+        
+            InputService.WindowFocusReleased:Connect(function()
+                OldLevel = settings().Rendering.QualityLevel
+        
+                RunService:Set3dRenderingEnabled(false)
+                settings().Rendering.QualityLevel = 1
+                setfpscap(_TARGETFPS)
+            end)
+        
+            setfpscap(_TARGETFPS)
+        end
     end
 end)
 
@@ -4879,7 +4909,7 @@ task.spawn(function() --Sakata
 end)
 
 
-local CoreGui = game:GetService("CoreGui")
+--[[ local CoreGui = game:GetService("CoreGui")
 
 if type(gethui) == 'function' then
 	CoreGui = gethui()
@@ -4952,7 +4982,8 @@ local con2 = UserInputService.InputBegan:Connect(function(input) if paused and i
 
 if caniswindowactive and iswindowactive() ~= true then
 	pause()
-end
+end ]]
+
 
 if _G.autoload then
     if isfile("kocmoc/BSS_" .. _G.autoload .. ".json") then
