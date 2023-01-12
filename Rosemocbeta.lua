@@ -4109,8 +4109,7 @@ task.spawn(function()
                 end
             end
             if kocmoc.toggles.autofeast then
-                game:GetService("ReplicatedStorage").Events.ToyEvent:FireServer(
-                    "Beesmas Feast")
+                game:GetService("ReplicatedStorage").Events.ToyEvent:FireServer("Beesmas Feast")
                 platformm = game.Workspace.Toys["Beesmas Feast"]
                                 .Platform
                 for i, v in pairs(game.Workspace.Collectibles:GetChildren()) do
@@ -4732,9 +4731,7 @@ task.spawn(function()
         local mmsUpd = panel2:CreateButton("Mythic Meteor Shower: 00:00", function()
             api.tween(1, CFrame.new( game.Workspace.Toys["Mythic Meteor Shower"].Platform.Position + Vector3.new(0, 5, 0)))
         end)
-        local hwUpd = panel2:CreateButton("Honey Wreath: 00:00", function()
-            api.tween(1, CFrame.new( game.Workspace.Toys["Honey Wreath"].Platform.Position + Vector3.new(0, 5, 0)))
-        end)
+        
         local utilities = {
             ["Red Field Booster"] = rfbUpd,
             ["Blue Field Booster"] = bfbUpd,
@@ -4745,8 +4742,37 @@ task.spawn(function()
             ["Instant Converter C"] = ic3,
             ["Wealth Clock"] = wcUpd,
             ["Mythic Meteor Shower"] = mmsUpd,
-            ["Honey Wreath"] = hwUpd
+            ["Honey Wreath"] = hwUpd,
+            ["Snow Machine"] = smUpd,
+            ["Gingerbread House"] = gbUpd,
+            ["Samovar"] = smvrUpd,
+            ["Honeyday Candles"] = hcUpd,
+            ["Beesmas Feast"] = bfUpd,
+            ["Onett's Lid Art"] = olaUpd
         }
+
+        local panel3 = hometab:CreateSection("Beesmas Panel ["..Beesmas.."]")
+        local hwUpd = panel2:CreateButton("Honey Wreath: 00:00", function()
+            api.tween(1, CFrame.new( game.Workspace.Toys["Honey Wreath"].Platform.Position + Vector3.new(0, 5, 0)))
+        end)
+        local smUpd = panel3:CreateButton("Snow Machine: 00:00", function()
+            api.tween(1, CFrame.new( game.Workspace.Toys["Snow Machine"].Platform.Position + Vector3.new(0, 5, 0)))
+        end)
+        local gbUpd = panel3:CreateButton("Gingerbread House: 00:00", function()
+            api.tween(1, CFrame.new( game.Workspace.Toys["Gingerbread House"].Platform.Position + Vector3.new(0, 5, 0)))
+        end)
+        local smvrUpd = panel3:CreateButton("Samovar: 00:00", function()
+            api.tween(1, CFrame.new( game.Workspace.Toys["Samovar"].Platform.Position + Vector3.new(0, 5, 0)))
+        end)
+        local hcUpd = panel3:CreateButton("Honeyday Candles: 00:00", function()
+            api.tween(1, CFrame.new( game.Workspace.Toys["Honeyday Candles"].Platform.Position + Vector3.new(0, 5, 0)))
+        end)
+        local bfUpd = panel3:CreateButton("Beesmas Feast: 00:00", function()
+            api.tween(1, CFrame.new( game.Workspace.Toys["Beesmas Feast"].Platform.Position + Vector3.new(0, 5, 0)))
+        end)
+        local olaUpd = panel3:CreateButton("Onett's Lid Art: 00:00", function()
+            api.tween(1, CFrame.new( game.Workspace.Toys["Onett's Lid Art"].Platform.Position + Vector3.new(0, 5, 0)))
+        end)
         while task.wait(1) do
             if kocmoc.toggles.enablestatuspanel then
                 for i, v in pairs(statusTable) do
