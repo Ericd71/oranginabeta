@@ -1,6 +1,7 @@
+-- BETA
 repeat task.wait(0.1) until game:IsLoaded()
 
-local OriginaBeta = function(VybfVlKAt3h03dqDsMaI, autoload, loadRecent)
+local OranginaBeta = function(VybfVlKAt3h03dqDsMaI, autoload, loadRecent)
 getgenv().Star = "⭐"
 getgenv().Danger = "⚠️"
 getgenv().ExploitSpecific = "📜"
@@ -1694,7 +1695,7 @@ local function useConvertors()
     if lastWithoutCooldown ~= nil and string.find(kocmoc.vars.autouseMode, "Honey Wreath") or string.find(kocmoc.vars.autouseMode, "All") then
         if converted == false then
             game:GetService("ReplicatedStorage").Events.ToyEvent:FireServer(lastWithoutCooldown)
-            platformm = game.Workspace.Toys.HoneyWreath.Platform
+            platformm = game:GetService("Workspace").Toys["Honey Wreath"].Platform
             for i, v in pairs(game.Workspace.Collectibles:GetChildren()) do
                 if (v.Position - platformm.Position).magnitude < 25 and v.CFrame.YVector.Y == 1 then
                     api.humanoidrootpart().CFrame = v.CFrame
@@ -4299,7 +4300,7 @@ task.spawn(function()
             end
             if kocmoc.toggles.autohoneywreath then
                 game:GetService("ReplicatedStorage").Events.ToyEvent:FireServer("Honey Wreath")
-                platformm = game.Workspace.Toys.HoneyWreath.Platform
+                platformm = game:GetService("Workspace").Toys["Honey Wreath"].Platform
                 for i, v in pairs(game.Workspace.Collectibles:GetChildren()) do
                     if (v.Position - platformm.Position).magnitude < 25 and
                         v.CFrame.YVector.Y == 1 then
@@ -5285,4 +5286,4 @@ if workspace:FindFirstChild("Gates") and workspace.Gates:FindFirstChild("15 Bee 
 end
 end
 
-return OriginaBeta
+return OranginaBeta
