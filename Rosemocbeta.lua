@@ -1436,15 +1436,17 @@ function getfuzzy()
 end
 function getdigital()
     pcall(function()
-        for i,v in next, game.Workspace.Camera.DupedTokens:GetChildren() do
-            if v.Name == "C" and v:FindFirstChild('FrontDecal') and string.find(v.FrontDecal.Texture,"5877939956") then
-                local hashed = math.random(1, 42345252)
-                v.Name = tostring(hashed)
-                repeat task.wait(0.1)
-                    api.tween(1, CFrame.new(v.CFrame.X, v.CFrame.Y - 14, v.CFrame.Z))
-                    --[[ api.humanoidrootpart().Velocity = Vector3.new(0, 0, 0)
-                    api.humanoidrootpart().CFrame = CFrame.new(v.CFrame.X, v.CFrame.Y - 14, v.CFrame.Z) ]]
-                until not game.Workspace.Camera.DupedTokens:FindFirstChild(hashed)
+        if not temptable.converting then
+            for i,v in next, game.Workspace.Camera.DupedTokens:GetChildren() do
+                if v.Name == "C" and v:FindFirstChild('FrontDecal') and string.find(v.FrontDecal.Texture,"5877939956") then
+                    local hashed = math.random(1, 42345252)
+                    v.Name = tostring(hashed)
+                    repeat task.wait(0.1)
+                        api.tween(1, CFrame.new(v.CFrame.X, v.CFrame.Y - 14, v.CFrame.Z))
+                        --[[ api.humanoidrootpart().Velocity = Vector3.new(0, 0, 0)
+                        api.humanoidrootpart().CFrame = CFrame.new(v.CFrame.X, v.CFrame.Y - 14, v.CFrame.Z) ]]
+                    until not game.Workspace.Camera.DupedTokens:FindFirstChild(hashed)
+                end
             end
         end
     end)
