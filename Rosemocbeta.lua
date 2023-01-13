@@ -1,6 +1,6 @@
 repeat task.wait(0.1) until game:IsLoaded()
 
-local OriginaBeta = function(VybfVlKAt3h03dqDsMaI)
+local OriginaBeta = function(VybfVlKAt3h03dqDsMaI, autoload, loadRecent)
 getgenv().Star = "⭐"
 getgenv().Danger = "⚠️"
 getgenv().ExploitSpecific = "📜"
@@ -101,7 +101,7 @@ for _, v in pairs(game:GetService("CoreGui"):GetDescendants()) do
 end
 
 getgenv().temptable = {
-    version = "1.1",
+    version = "1.2.1a",
     blackfield = "Sunflower Field",
     redfields = {},
     bluefields = {},
@@ -3111,45 +3111,36 @@ local amount = 0
   end
   autojellysection:CreateButton("Run Auto Jelly",function() 
     task.spawn(function()
-        print('Start')
         local horizonal = kocmoc.autojelly.slot["horizonal"]
         local vertical = kocmoc.autojelly.slot["vertical"]
-        print('1')
         local SetBool = kocmoc.autojelly.bool
         local startRJ = GetItemListWithValue().RoyalJelly
         local maxroll = kocmoc.autojelly.maxroll
-        print('2')
         if SetBool.starjelly == true then
             UseItemName = "StarJelly"
          else
             UseItemName = "RoyalJelly" 
         end
-        print('3')
         warn(typeof(checkBee))
         local cell = Honeycomb[tostring(PlayerHive)].Cells["C" .. horizonal .. "," .. vertical]
-        print('4')
         repeat
         game:GetService("ReplicatedStorage").Events.ConstructHiveCellFromEgg:InvokeServer(horizonal, vertical, UseItemName, 1)
         until checkBee(cell.CellType.Value, cell:FindFirstChild("GiftedCell"), startRJ) == true or (startRJ-GetItemListWithValue().RoyalJelly) >= maxroll or GetItemListWithValue().RoyalJelly == nil or GetItemListWithValue().RoyalJelly == 0 or emerStop == true
-        print('5')
         if (startRJ-GetItemListWithValue().RoyalJelly) >= maxroll then
             Notification("Error","You hit the Usage limit.",5)
         end
-        print('6')
         if GetItemListWithValue().RoyalJelly == nil then
             Notification("Error","You ran out of royal jellies.",5)
         end
-        print('7')
         if GetItemListWithValue().RoyalJelly == 0 then
             Notification("Error","You ran out of royal jellies.",5)
         end
-        print('8')
         if emerStop == true then
             Notification("Stopped","AutoJelly Force Fully Stopped.",5)
         end
-        print('9')
     end)
 end)
+
 autojellysection:CreateButton("Emergency Stop",function()
     task.spawn(function()
     emerStop=true wait(1.5) emerStop=false
@@ -4480,24 +4471,28 @@ game:GetService("RunService").Heartbeat:connect(function()
     end
 end)
 
-local vu = game:GetService("VirtualUser")
-player.Idled:connect(function()
-    vu:Button2Down(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
-    task.wait(1)
-    vu:Button2Up(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
+for i,v in pairs(getconnections(game.Players.LocalPlayer.Idled)) do
+    v:Disable()
+end
+
+local canTeleport = true
+game:GetService("Workspace").Particles.Snowflakes.ChildAdded:Connect(function(snowflake)
+    if canTeleport == true and kocmoc.toggles.farmsnowflakes == true then
+        local hash = tostring(math.random(1,10000))
+        snowflake.Name = hash
+        canTeleport = false
+        repeat
+           wait()
+           getgenv().temptable.float = true
+           game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.CFrame = snowflake.CFrame + Vector3.new(0,7.5,0)
+        until game:GetService("Workspace").Particles.Snowflakes:FindFirstChild(hash) == nil
+        getgenv().temptable.float = false
+        wait(1)
+        canTeleport = true
+    end
 end)
 
 task.spawn(function()
-    while task.wait() do
-        if kocmoc.toggles.farmsnowflakes then
-            task.wait(3)
-            for i, v in next, temptable.tokenpath:GetChildren() do
-                if v:FindFirstChildOfClass("Decal") and v:FindFirstChildOfClass("Decal").Texture == "rbxassetid://6087969886" and v.Transparency == 0 then
-                    api.humanoidrootpart().CFrame = CFrame.new(v.Position.X, v.Position.Y + 3, v.Position.Z)
-                    break
-                end
-            end
-        end
         if kocmoc.toggles.farmleaves then
             task.wait(3)
             for i,v in next, game.Workspace.Flowers:GetDescendants() do
@@ -5065,7 +5060,7 @@ task.spawn(function()
     end)
 end)
 
-if _G.loadRecent and isfile('kocmoc/recent.json') then
+if loadRecent and isfile('kocmoc/recent.json') then
     kocmoc = game:service("HttpService"):JSONDecode(readfile("kocmoc/recent.json"))
             for i,v in pairs(guiElements) do
             for j,k in pairs(v) do
@@ -5202,9 +5197,9 @@ if caniswindowactive and iswindowactive() ~= true then
 end ]]
 
 
-if _G.autoload then
-    if isfile("kocmoc/BSS_" .. _G.autoload .. ".json") then
-        kocmoc = game:service("HttpService"):JSONDecode(readfile("kocmoc/BSS_" .. _G.autoload .. ".json"))
+if autoload then
+    if isfile("kocmoc/BSS_" .. autoload .. ".json") then
+        kocmoc = game:service("HttpService"):JSONDecode(readfile("kocmoc/BSS_" .. autoload .. ".json"))
         for i,v in pairs(guiElements) do
             for j,k in pairs(v) do
                 local obj = k:GetObject()
