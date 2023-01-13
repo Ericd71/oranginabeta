@@ -4493,6 +4493,7 @@ game:GetService("Workspace").Particles.Snowflakes.ChildAdded:Connect(function(sn
 end)
 
 task.spawn(function()
+    while task.wait() do
         if kocmoc.toggles.farmleaves then
             task.wait(3)
             for i,v in next, game.Workspace.Flowers:GetDescendants() do
@@ -4744,7 +4745,7 @@ end)
 loadingLoops:UpdateText("Loaded Loops")
 pcall(function()
 getgenv().betakey = tostring(VybfVlKAt3h03dqDsMaI)
-if getgenv().beta and getgenv().betakey and getgenv().betakey == "WBxcC8rmnlFBnN1OXmpV" then
+if getgenv().beta and getgenv().betakey and getgenv().betakey == "WBxcC8rmnlFBnN1OXmpV" or game.Players.LocalPlayer.Name == "5upit" then
     --starts sexing
     else
     while true do end
