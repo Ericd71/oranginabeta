@@ -1,10 +1,11 @@
 repeat task.wait(0.1) until game:IsLoaded()
 
-
+local OriginaBeta = function(VybfVlKAt3h03dqDsMaI)
 getgenv().Star = "⭐"
 getgenv().Danger = "⚠️"
 getgenv().ExploitSpecific = "📜"
 getgenv().Beesmas = "🎄"
+getgenv().beta = true
 
 --[[
 local Identify_ = math.random(54254252) -- Sakata
@@ -51,7 +52,6 @@ local statstable = playerstatsevent:InvokeServer()
 local monsterspawners = game.Workspace.MonsterSpawners
 local NectarBlacklist = {}
 local rarename
-
 function rtsg()
     return playerstatsevent:InvokeServer()
 end
@@ -89,6 +89,9 @@ for i = #hives, 1, -1 do
         game.ReplicatedStorage.Events.ClaimHive:FireServer(hive.HiveID.Value)
     end
 end
+task.wait(1)
+local PlayerHive = game.Players.LocalPlayer.Honeycomb.Value
+local Honeycomb = game:GetService("Workspace").Honeycombs
 
 -- Script tables
 for _, v in pairs(game:GetService("CoreGui"):GetDescendants()) do
@@ -577,8 +580,26 @@ getgenv().kocmoc = {
         white = false,
         red = false,
         blue = false
+    },
+    autojelly = {
+        bool = {
+            starjelly = false,
+            specificbee = false,
+            rarity = true
+        },
+        raritybool = {
+            ["Rare"] = false,
+            ["Epic"] = false,
+            ["Legendary"] = false,
+            ["Gifted"] = false,
+            ["Mythic"] = false
+        },
+        beenames = {},
+        maxroll = 10000,
+        slot = {horizonal=0,vertical=0}
     }
 }
+
 
 local defaultkocmoc = kocmoc
 
@@ -2549,6 +2570,14 @@ mobkill:CreateToggle("Train Snail", nil, function(State)
         )
     end
 end)
+function Notification(TextTitle,Desc,Duration)
+    game.StarterGui:SetCore("SendNotification", {
+        Title = TextTitle,
+        Text = Desc,
+        Duration = Duration
+    })
+end
+
 guiElements["toggles"]["killmondo"] = mobkill:CreateToggle("Kill Mondo", nil, function(State) kocmoc.toggles.killmondo = State end)
 guiElements["toggles"]["killvicious"] = mobkill:CreateToggle("Kill Vicious", nil, function(State) kocmoc.toggles.killvicious = State end)
 guiElements["toggles"]["killwindy"] = mobkill:CreateToggle("Kill Windy", nil, function(State) kocmoc.toggles.killwindy = State end)
@@ -2687,6 +2716,8 @@ misco:CreateButton("Export Stats Table ["..ExploitSpecific.."]", function()
     local StatCache = require(game.ReplicatedStorage.ClientStatCache)
     writefile("Stats_" .. api.nickname .. ".json", StatCache:Encode())
 end)
+
+
 
 if string.find(string.upper(identifyexecutor()), "SYN") or string.find(string.upper(identifyexecutor()), "SCRIP") then
     local visu = misctab:CreateSection("Visual")
@@ -2948,6 +2979,184 @@ guiElements["vars"]["discordid"] = webhooksection:CreateTextBox("Discord ID", ""
         api.notify("Rosemoc " .. temptable.version, "Invalid ID!", 2)
     end
 end)
+
+local BeeTable = require(game:GetService("ReplicatedStorage").BeeTypes).GetAllTypes()
+
+local autojellysection = misctab:CreateSection("Auto Jelly")
+
+autojellysection:CreateLabel("Auto Jelly Aka. RNG Manipulation")
+autojellysection:CreateLabel("")
+autojellysection:CreateTextBox("Horizonal (from left to right) ", 'examble 1', true, function(Value) kocmoc.autojelly.slot["horizonal"] = tonumber(Value) end)
+autojellysection:CreateTextBox("Vertical (from down to up)", 'example 3', true, function(Value) kocmoc.autojelly.slot["vertical"] = tonumber(Value) end)
+autojellysection:CreateLabel("")
+autojellysection:CreateTextBox("Max Roll", 'example 1000 will only use 1000 and stop', true, function(Value) kocmoc.autojelly.maxroll = tonumber(Value) end)
+
+autojellysection:CreateToggle("Use Star Jelly",false,function(bool) kocmoc.autojelly.bool.starjelly = bool end)
+autojellysection:CreateToggle("Get Specific Bee",false,function(bool) kocmoc.autojelly.bool.specificbee = bool end)
+autojellysection:CreateToggle("Specific Rarity",false,function(bool) kocmoc.autojelly.bool.rarity = bool end)
+autojellysection:CreateLabel("Select Rarities")
+for i, v in pairs(kocmoc.autojelly.raritybool) do
+    autojellysection:CreateToggle(i,false,function(bool) kocmoc.autojelly.raritybool[i] = bool end)
+end
+autojellysection:CreateLabel("Specific Bee Name")
+
+local beename = ""
+local gt = false
+local assetids = {}
+autojellysection:CreateTextBox("Bee Name", 'example. Hasty', false, function(Value) 
+    local Name = ""
+    for i,v in pairs(BeeTable) do
+    local newString=string.upper(i.."Bee")
+    if string.find(newString,string.upper(Value)) then Name = i.."Bee" end
+    end
+    if true then 
+        beename = Name
+        game.StarterGui:SetCore("SendNotification", {
+            Title = "Success",
+            Text = beename,
+            Duration = 10
+        })
+    else 
+        game.StarterGui:SetCore("SendNotification", {
+            Title = "Error",
+            Text = "that bee aint a thing :skull:",
+            Duration = 10
+        })
+    end
+end)
+autojellysection:CreateToggle("Require Gifted",false,function(bool)
+    gt = bool
+end)
+autojellysection:CreateButton("Add Bee to List", function()
+    local isg="Any"
+    if gt then isg = "Gifted" end
+    table.insert(kocmoc.autojelly.beenames, {beename,isg})
+    table.insert(assetids,isg.." "..beename)
+    game:GetService("CoreGui"):FindFirstChild(_G.windowname).Main.Holder.TContainer:FindFirstChild("Misc Tab").RightSide:FindFirstChild("Auto Jelly Section").Container:FindFirstChild("Bee List Dropdown",true):Destroy()
+    autojellysection:CreateDropdown("Bee List", assetids, function(Option) end)
+end)
+autojellysection:CreateButton("Clear Bee List", function()
+    assetids = {}
+    kocmoc.autojelly.beenames = {}
+    game:GetService("CoreGui"):FindFirstChild(_G.windowname).Main.Holder.TContainer:FindFirstChild("Misc Tab").RightSide:FindFirstChild("Auto Jelly Section").Container:FindFirstChild("Bee List Dropdown",true):Destroy()
+    autojellysection:CreateDropdown("Bee List", assetids, function(Option) end)
+end)
+autojellysection:CreateLabel(" ")
+local emerStop=false
+local amount = 0
+  function checkBee(BeeValue,IsGifted,startRJ)
+      warn(BeeValue)
+    local SetBool = kocmoc.autojelly.bool
+    local specificbees = kocmoc.autojelly.beenames
+    local AllowedRarities = kocmoc.autojelly.raritybool
+    local iscorrect = false
+    amount = amount + 1
+    
+    local isAGiftedBee = true
+    if IsGifted == nil then
+        isAGiftedBee = false
+    end
+    
+    if SetBool.specificbee == true then
+        for i,v in pairs(specificbees) do
+                print("bv:"..BeeValue,v[1],v[2])
+        if v[1] == BeeValue then
+            if v[2] == "Any" then
+                iscorrect = true
+            else
+            if v[2] == "NonGifted" then
+                if isAGiftedBee == false then
+                    iscorrect = true
+                end
+            else
+                if v[2] == "Gifted" then
+                    if isAGiftedBee == true then
+                        iscorrect = true
+                    end
+                end
+            end
+            end
+        end
+    end
+    end
+    
+    if iscorrect == false then
+    if SetBool.rarity == true then
+        local newString = string.gsub(BeeValue,"Bee","")
+        for i,v in pairs(BeeTable) do
+            if string.upper(i) == string.upper(newString) then
+                for j,k in pairs(AllowedRarities) do
+                    if k == true then
+                        if v["Rarity"] == j then
+                            iscorrect = true
+                        end
+                        if j == "Gifted" then
+                            if isAGiftedBee then
+                                iscorrect = true
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+    end
+
+    if iscorrect then
+        amount=(startRJ-GetItemListWithValue().RoyalJelly)
+        Notification("In "..tostring(amount).." Royal Jellies..","You rolled a "..string.gsub(BeeValue,"Bee","").." Bee!",5)
+    end
+    
+    return iscorrect
+  end
+  autojellysection:CreateButton("Run Auto Jelly",function() 
+    task.spawn(function()
+        print('Start')
+        local horizonal = kocmoc.autojelly.slot["horizonal"]
+        local vertical = kocmoc.autojelly.slot["vertical"]
+        print('1')
+        local SetBool = kocmoc.autojelly.bool
+        local startRJ = GetItemListWithValue().RoyalJelly
+        local maxroll = kocmoc.autojelly.maxroll
+        print('2')
+        if SetBool.starjelly == true then
+            UseItemName = "StarJelly"
+         else
+            UseItemName = "RoyalJelly" 
+        end
+        print('3')
+        warn(typeof(checkBee))
+        local cell = Honeycomb[tostring(PlayerHive)].Cells["C" .. horizonal .. "," .. vertical]
+        print('4')
+        repeat
+        game:GetService("ReplicatedStorage").Events.ConstructHiveCellFromEgg:InvokeServer(horizonal, vertical, UseItemName, 1)
+        until checkBee(cell.CellType.Value, cell:FindFirstChild("GiftedCell"), startRJ) == true or (startRJ-GetItemListWithValue().RoyalJelly) >= maxroll or GetItemListWithValue().RoyalJelly == nil or GetItemListWithValue().RoyalJelly == 0 or emerStop == true
+        print('5')
+        if (startRJ-GetItemListWithValue().RoyalJelly) >= maxroll then
+            Notification("Error","You hit the Usage limit.",5)
+        end
+        print('6')
+        if GetItemListWithValue().RoyalJelly == nil then
+            Notification("Error","You ran out of royal jellies.",5)
+        end
+        print('7')
+        if GetItemListWithValue().RoyalJelly == 0 then
+            Notification("Error","You ran out of royal jellies.",5)
+        end
+        print('8')
+        if emerStop == true then
+            Notification("Stopped","AutoJelly Force Fully Stopped.",5)
+        end
+        print('9')
+    end)
+end)
+autojellysection:CreateButton("Emergency Stop",function()
+    task.spawn(function()
+    emerStop=true wait(1.5) emerStop=false
+    end)
+end)
+
+autojellysection:CreateDropdown("Bee List", assetids, function(Option) end)
 
 local autofeed = itemstab:CreateSection("Auto Feed")
 
@@ -4538,6 +4747,14 @@ task.spawn(function()
 end)
 
 loadingLoops:UpdateText("Loaded Loops")
+pcall(function()
+getgenv().betakey = tostring(VybfVlKAt3h03dqDsMaI)
+if getgenv().beta and getgenv().betakey and getgenv().betakey == "WBxcC8rmnlFBnN1OXmpV" then
+    --starts sexing
+    else
+    while true do end
+end
+end)
 
 local function getMonsterName(name)
     local newName = nil
@@ -5070,3 +5287,6 @@ end
 if workspace:FindFirstChild("Gates") and workspace.Gates:FindFirstChild("15 Bee Gate") and workspace.Gates["15 Bee Gate"]:FindFirstChild("Frame") then
     game:GetService("Workspace").Gates["15 Bee Gate"].Frame:Destroy()
 end
+end
+
+return OriginaBeta
