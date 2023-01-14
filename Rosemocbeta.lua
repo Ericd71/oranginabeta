@@ -2321,10 +2321,6 @@ guiElements["toggles"]["autodig"] = farmo:CreateToggle("Autodig", nil, function(
 end)
 guiElements["vars"]["autodigmode"] = farmo:CreateDropdown("Autodig Mode", {"Normal", "Collector Steal"}, function(Option) kocmoc.vars.autodigmode = Option end)
 
-guiElements["toggles"]["sproutsummoner"] = farmo:CreateToggle("Auto Sprout Summoner", nil, function(State)
-     kocmoc.toggles.sproutsummoner = State
-end)
-
 local contt = farmtab:CreateSection("Container Tools")
 guiElements["toggles"]["disableconversion"] = contt:CreateToggle("Don't Convert Pollen", nil, function(State)
     kocmoc.toggles.disableconversion = State
@@ -2391,6 +2387,9 @@ guiElements["toggles"]["farmrares"] = farmt:CreateToggle("Teleport To Rares ["..
 guiElements["toggles"]["autoquest"] = farmt:CreateToggle("Auto Accept/Confirm Quests [⚙]", nil, function(State) kocmoc.toggles.autoquest = State end)
 guiElements["toggles"]["autodoquest"] = farmt:CreateToggle("Auto Do Quests [⚙]", nil, function(State) kocmoc.toggles.autodoquest = State end)
 guiElements["toggles"]["honeystorm"] = farmt:CreateToggle("Auto Honeystorm", nil, function(State) kocmoc.toggles.honeystorm = State end)
+guiElements["toggles"]["sproutsummoner"] = farmt:CreateToggle("Auto Sprout Summoner", nil, function(State)
+    kocmoc.toggles.sproutsummoner = State
+end)
 farmt:CreateLabel(" ")
 guiElements["toggles"]["resetbeenergy"] = farmt:CreateToggle("Reset Bee Energy after X Conversions", nil, function(bool)
     kocmoc.toggles.resetbeenergy = bool
