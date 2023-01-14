@@ -4977,7 +4977,7 @@ end)
 local commandospawn = false
 task.spawn(function() -- Commando Sakata
         while task.wait(1) do
-            if not findcommando() then
+            if findcommando() ~= true then
                 temptable.float = false
             end
             if kocmoc.toggles.traincommando and not monsterspawners["Commando Chick"].Attachment.TimerGui.TimerLabel.Visible and not temptable.converting and not temptable.started.monsters and not game.Workspace.Toys["Ant Challenge"].Busy.Value then
