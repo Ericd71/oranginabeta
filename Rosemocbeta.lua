@@ -1,12 +1,12 @@
 -- BETA
 repeat task.wait(0.1) until game:IsLoaded()
 
-local OranginaBeta = function(VybfVlKAt3h03dqDsMaI, autoload, loadRecent)
+local OranginaBeta = function(VybfVlKAt3h03dqDsMaI, autoload, loadRecent, isbeta, ...)
 getgenv().Star = "⭐"
 getgenv().Danger = "⚠️"
 getgenv().ExploitSpecific = "📜"
 getgenv().Beesmas = "🎄"
-getgenv().beta = true
+getgenv().beta = isbeta or true
 
 --[[
 local Identify_ = math.random(54254252) -- Sakata
@@ -4953,11 +4953,20 @@ local commandospawn = false
 task.spawn(function() -- Commando Sakata
         while task.wait(1) do
             if kocmoc.toggles.traincommando and not monsterspawners["Commando Chick"].Attachment.TimerGui.TimerLabel.Visible and not temptable.converting and not temptable.started.monsters and not game.Workspace.Toys["Ant Challenge"].Busy.Value then
-                disableall()
-                if not commandospawn then
-                    api.humanoidrootpart().CFrame = CFrame.new(monsterspawners["Commando Chick"].Position)
-                end
                 temptable.started.commando = true
+                disableall()
+                --if not commandospawn then
+                for i, v in next, game.workspace.Monsters:GetChildren() do
+                    if string.find(v.Name, "Commando") then
+                        commandospawn = true
+                    else
+                        commandospawn = false
+                    end
+                end
+                if commandospawn == false then
+                    api.humanoidrootpart().CFrame = CFrame.new(monsterspawners["Commando Chick"].Position)
+                    task.wait(0.5)
+                end
                 for i, v in next, game.workspace.Monsters:GetChildren() do
                     for x in string.gmatch(v.Name, "Commando") do
                         while kocmoc.toggles.traincommando and commandospawn == true do
@@ -4971,12 +4980,12 @@ task.spawn(function() -- Commando Sakata
                                     end
                                     task.wait(.3)
                                 end
-                            else
-                                commandospawn = false
+                                else
+                                    temptable.float = false
+                            end
                         end
                     end
                 end
-            end
                 enableall()
                 task.wait(1)
                 temptable.float = false
