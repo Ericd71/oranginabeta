@@ -1479,6 +1479,7 @@ function getflame()
 end
 
 function farmcombattokens(v, pos, type)
+    pcall(function()
     if type == 'crab' then
         if v.CFrame.YVector.Y == 1 and v.Transparency == 0 and v ~= nil and v.Parent ~= nil then
             if (v.Position - pos.Position).Magnitude < 50 then
@@ -1499,19 +1500,32 @@ function farmcombattokens(v, pos, type)
                 api.teleport(pos)
             end
         end
-    --[[ elseif type == 'mondo' then
+    elseif type == 'mondo' then
         if temptable.MondoCollectTokens then return end
         if v.CFrame.YVector.Y == 1 and v.Transparency == 0 and v ~= nil and v.Parent ~= nil then
             if (v.Position - pos.Position).Magnitude < 25 then
                 repeat
                     task.wait()
-                    api.tweenNoDelay(0.5, v.CFrame)
+                    api.humanoidrootpart().CFrame = CFrame.new(v.Position)
                 until not v.Parent or v.CFrame.YVector.Y ~= 1 or not v
                 api.teleport(pos)
             end
-        end ]]
+        end
+    elseif type == 'commando' then
+    if temptable.MondoCollectTokens then return end
+        if v.CFrame.YVector.Y == 1 and v.Transparency == 0 and v ~= nil and v.Parent ~= nil then
+            if (v.Position - pos.Position).Magnitude < 25 and v.Parent and v then
+                repeat
+                    task.wait()
+                    api.humanoidrootpart().CFrame = CFrame.new(v.Position)
+                until not v.Parent or v.CFrame.YVector.Y ~= 1 or not v
+                api.teleport(pos)
+            end
+        end
     end
+end)
 end
+
 
 function avoidmob()
     for i, v in next, game.Workspace.Monsters:GetChildren() do
@@ -2564,6 +2578,7 @@ guiElements["vars"]["customplanterdelay35"] = customplanter3section:CreateSlider
 end)
 
 local mobkill = combtab:CreateSection("Combat")
+guiElements["toggles"]["traincommando"] = mobkill:CreateToggle("Train Commando", nil, function(State) kocmoc.toggles.traincommando = State end)
 mobkill:CreateToggle("Train Crab", nil, function(State)
     if State then
         api.teleport(CFrame.new(-375, 110, 535))
@@ -2599,7 +2614,6 @@ function Notification(TextTitle,Desc,Duration)
 end
 
 guiElements["toggles"]["killmondo"] = mobkill:CreateToggle("Kill Mondo", nil, function(State) kocmoc.toggles.killmondo = State end)
-guiElements["toggles"]["traincommando"] = mobkill:CreateToggle("Train Commando", nil, function(State) kocmoc.toggles.traincommando = State end)
 guiElements["toggles"]["killvicious"] = mobkill:CreateToggle("Kill Vicious", nil, function(State) kocmoc.toggles.killvicious = State end)
 guiElements["toggles"]["killwindy"] = mobkill:CreateToggle("Kill Windy", nil, function(State) kocmoc.toggles.killwindy = State end)
 local autokillmobstoggle = mobkill:CreateToggle("Auto Kill Mobs", nil, function(State) kocmoc.toggles.autokillmobs = State end)
@@ -4279,6 +4293,14 @@ local con0 = InputService.WindowFocusReleased:Connect(pause)
 local con1 = InputService.WindowFocused:Connect(resume)
 local con2 = InputService.InputBegan:Connect(function(input) if paused and input.UserInputState == Enum.UserInputState.Begin and input.UserInputType == Enum.UserInputType.Keyboard then resume(); end; end)
 
+local findcommando = function()
+    for i, v in ipairs(workspace.Monsters:GetChildren()) do
+        if v.Name:find('Commando') then
+            return true
+        end
+    end
+end
+
 game.Workspace.Collectibles.ChildAdded:Connect(function(token) -- kometa
     if kocmoc.toggles.trainsnail  then
         farmcombattokens(token, CFrame.new(game.Workspace.FlowerZones['Stump Field'].Position.X, game.Workspace.FlowerZones['Stump Field'].Position.Y-20, game.Workspace.FlowerZones['Stump Field'].Position.Z), 'snail')
@@ -4295,6 +4317,9 @@ game.Workspace.Collectibles.ChildAdded:Connect(function(token) -- kometa
     end
     if kocmoc.toggles.killmondo and game.Workspace.Monsters:FindFirstChild("Mondo Chick (Lvl 8)") then --sakata xd lol
         farmcombattokens(token, CFrame.new(game.Workspace.FlowerZones['Mountain Top Field'].Position.X, game.Workspace.FlowerZones['Mountain Top Field'].Position.Y-40, game.Workspace.FlowerZones['Mountain Top Field'].Position.Z), 'mondo')
+    end
+    if kocmoc.toggles.traincommando and findcommando() then
+        farmcombattokens(token, CFrame.new(api.humanoidrootpart().Position), 'commando')
     end
 end)
 
