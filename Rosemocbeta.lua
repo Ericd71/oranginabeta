@@ -121,6 +121,7 @@ getgenv().temptable = {
         windy = false,
         ant = false,
         monsters = false,
+        commando = false,
         crab = false
     },
     detected = {vicious = false, windy = false},
@@ -145,7 +146,8 @@ getgenv().temptable = {
         autofarm = false,
         killmondo = false,
         vicious = false,
-        windy = false
+        windy = false,
+        commando = false
     },
     allplanters = {},
     planters = {
@@ -408,6 +410,7 @@ getgenv().kocmoc = {
         farmclouds = false,
         killmondo = false,
         killvicious = false,
+        traincommando = false,
         loopspeed = false,
         loopjump = false,
         autoquest = false,
@@ -438,6 +441,7 @@ getgenv().kocmoc = {
         autostockings = false,
         autosamovar = false,
         autosnowmachine = false,
+        sproutsummoner = false, --zvaq
         ptsrage = false, --sakata
         autohoneywreath = false,
         autoonettart = false,
@@ -804,6 +808,10 @@ function disableall()
         kocmoc.toggles.killwindy = false
         temptable.cache.windy = true
     end
+    if kocmoc.toggles.traincommando and not temptable.started.commando then
+        kocmoc.toggles.commando = false
+        temptable.cache.commando = true
+    end
 end
 
 function enableall()
@@ -822,6 +830,10 @@ function enableall()
     if temptable.cache.windy then
         kocmoc.toggles.killwindy = true
         temptable.cache.windy = false
+    end
+    if temptable.cache.commando then
+        kocmoc.toggles.traincommando = true
+        temptable.cache.traincommando = false
     end
 end
 
@@ -2262,7 +2274,8 @@ information:CreateLabel("📜 - May be exploit specific")
 information:CreateLabel(Beesmas.." - Beesmas Function")
 information:CreateLabel("Script by OrangeIsTheColor")
 information:CreateLabel("With help from Sakata#4939")
-information:CreateLabel("Originally by weuz_, mrdevl, Boxking776 and RoseGold#5441")
+information:CreateLabel("Originally by weuz_, mrdevl")
+information:CreateLabel("and RoseGold#5441")
 local gainedhoneylabel = information:CreateLabel("Gained Honey: 0")
 local uptimelabel = information:CreateLabel("Uptime: 0")
 information:CreateButton("Discord Invite", function()
@@ -2308,6 +2321,9 @@ guiElements["toggles"]["autodig"] = farmo:CreateToggle("Autodig", nil, function(
 end)
 guiElements["vars"]["autodigmode"] = farmo:CreateDropdown("Autodig Mode", {"Normal", "Collector Steal"}, function(Option) kocmoc.vars.autodigmode = Option end)
 
+guiElements["toggles"]["sproutsummoner"] = farmo:CreateToggle("Auto Sprout Summoner", nil, function(State)
+     kocmoc.toggles.sproutsummoner = State
+end)
 
 local contt = farmtab:CreateSection("Container Tools")
 guiElements["toggles"]["disableconversion"] = contt:CreateToggle("Don't Convert Pollen", nil, function(State)
@@ -2584,6 +2600,7 @@ function Notification(TextTitle,Desc,Duration)
 end
 
 guiElements["toggles"]["killmondo"] = mobkill:CreateToggle("Kill Mondo", nil, function(State) kocmoc.toggles.killmondo = State end)
+guiElements["toggles"]["traincommando"] = mobkill:CreateToggle("Train Commando", nil, function(State) kocmoc.toggles.traincommando = State end)
 guiElements["toggles"]["killvicious"] = mobkill:CreateToggle("Kill Vicious", nil, function(State) kocmoc.toggles.killvicious = State end)
 guiElements["toggles"]["killwindy"] = mobkill:CreateToggle("Kill Windy", nil, function(State) kocmoc.toggles.killwindy = State end)
 local autokillmobstoggle = mobkill:CreateToggle("Auto Kill Mobs", nil, function(State) kocmoc.toggles.autokillmobs = State end)
@@ -4259,8 +4276,6 @@ local pause = function()
     end
 end
 
-setfpscap(_TARGETFPS)
-
 local con0 = InputService.WindowFocusReleased:Connect(pause)
 local con1 = InputService.WindowFocused:Connect(resume)
 local con2 = InputService.InputBegan:Connect(function(input) if paused and input.UserInputState == Enum.UserInputState.Begin and input.UserInputType == Enum.UserInputType.Keyboard then resume(); end; end)
@@ -4591,6 +4606,14 @@ end)
 task.spawn(function()
     while task.wait(1) do
         temptable.currtool = rtsg()["EquippedCollector"]
+    end
+end)
+
+task.spawn(function()
+        while task.wait() do
+        if kocmoc.toggles.sproutsummoner then
+        game:GetService("ReplicatedStorage").Events.ToyEvent:FireServer("Sprout Summoner")
+        end
     end
 end)
 
@@ -4927,6 +4950,42 @@ task.spawn(function()
     end)
     end
 end)
+local commandospawn = false
+task.spawn(function() -- Commando Sakata
+        while task.wait(1) do
+            if kocmoc.toggles.traincommando and not monsterspawners["Commando Chick"].Attachment.TimerGui.TimerLabel.Visible and not temptable.converting and not temptable.started.monsters and not game.Workspace.Toys["Ant Challenge"].Busy.Value then
+                disableall()
+                if not commandospawn then
+                    api.humanoidrootpart().CFrame = CFrame.new(monsterspawners["Commando Chick"].Position)
+                end
+                temptable.started.commando = true
+                for i, v in next, game.workspace.Monsters:GetChildren() do
+                    for x in string.gmatch(v.Name, "Commando") do
+                        while kocmoc.toggles.traincommando and commandospawn == true do
+                            task.wait()
+                            if string.find(v.Name, "Commando") then
+                                commandospawn = true
+                                for i = 1, 4 do
+                                    temptable.float = true
+                                    if v:FindFirstChild('HumanoidRootPart') then
+                                        api.humanoidrootpart().CFrame = CFrame.new(v.HumanoidRootPart.Position.x, v.HumanoidRootPart.Position.y+15, v.HumanoidRootPart.Position.z)
+                                    end
+                                    task.wait(.3)
+                                end
+                            else
+                                commandospawn = false
+                        end
+                    end
+                end
+            end
+                enableall()
+                task.wait(1)
+                temptable.float = false
+                temptable.started.commando = false
+            end
+        end
+end)
+    
 
 task.spawn(function()
     pcall(function()
@@ -4961,6 +5020,9 @@ task.spawn(function()
                           .CFrame)
         end)
         local panel2 = hometab:CreateSection("Utility Panel")
+        local ssUpd = panel2:CreateButton("Sprout Summoner: 00:00", function()
+            api.tween(1, CFrame.new( game.Workspace.Toys["Sprout Summoner"].Platform.Position + Vector3.new(0, 5, 0)))
+        end)
         local windUpd = panel2:CreateButton("Wind Shrine: 00:00", function()
             api.tween(1,
                       CFrame.new(
@@ -5022,6 +5084,7 @@ task.spawn(function()
         end)
         
         local utilities = {
+            ["Sprout Summoner"] = ssUpd,
             ["Red Field Booster"] = rfbUpd,
             ["Blue Field Booster"] = bfbUpd,
             ["Field Booster"] = wfbUpd,
