@@ -1342,7 +1342,7 @@ end
 
 function getsparkles()
     for i,v in next, game.Workspace.Flowers:GetDescendants() do
-        if (v.Name == "Sparkles") and (v.Parent:IsA("Part")) and (v.Parent) then
+        if v.Name == "Sparkles" and v.Parent and v.Parent:IsA("Part") then
             disableall()
             api.humanoidrootpart().CFrame = CFrame.new(v.Parent.Position)
             task.wait(.5)
@@ -4198,8 +4198,8 @@ task.spawn(function()
                     end
                 end
             end
-        end
-        if kocmoc.toggles.cpusaver then
+        end -- removed below due to it looping shit so it lags and wont work properly
+        --[[if kocmoc.toggles.cpusaver then
             local InputService = game:GetService'UserInputService'
             local RunService = game:GetService'RunService'
             _TARGETFPS = 20
@@ -4211,7 +4211,7 @@ task.spawn(function()
         
             InputService.WindowFocused:Connect(function()
                 RunService:Set3dRenderingEnabled(true)
-                settings().Rendering.QualityLevel = OldLevel
+                settings().Rendering.QualityLevel = OldLevel 
                 setfpscap(60)
             end)
         
@@ -4224,9 +4224,39 @@ task.spawn(function()
             end)
         
             setfpscap(_TARGETFPS)
-        end
+        end]]
     end
 end)
+
+local InputService = game:GetService'UserInputService'
+local RunService = game:GetService'RunService'
+_TARGETFPS = 20
+
+local OldLevel = settings().Rendering.QualityLevel
+
+local resume = function()
+    if kocmoc.toggles.cpusaver then
+    RunService:Set3dRenderingEnabled(true)
+    settings().Rendering.QualityLevel = OldLevel --sakatalmao
+    setfpscap(60)
+    end
+end
+
+local pause = function()
+    if kocmoc.toggles.cpusaver then
+    OldLevel = settings().Rendering.QualityLevel
+
+    RunService:Set3dRenderingEnabled(false)
+    settings().Rendering.QualityLevel = 1
+    setfpscap(_TARGETFPS)
+    end
+end
+
+setfpscap(_TARGETFPS)
+
+local con0 = InputService.WindowFocusReleased:Connect(pause)
+local con1 = InputService.WindowFocused:Connect(resume)
+local con2 = InputService.InputBegan:Connect(function(input) if paused and input.UserInputState == Enum.UserInputState.Begin and input.UserInputType == Enum.UserInputType.Keyboard then resume(); end; end)
 
 game.Workspace.Collectibles.ChildAdded:Connect(function(token) -- kometa
         if kocmoc.toggles.trainsnail  then
@@ -5135,7 +5165,7 @@ local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 
 local GPUGUI = Instance.new("ScreenGui")
-GPUGUI.Name = 'GPUSaver'
+GPUGUI.Name = 'GPUSaver' --sakatalmao
 GPUGUI.Enabled = false
 GPUGUI.Parent = CoreGui
 
