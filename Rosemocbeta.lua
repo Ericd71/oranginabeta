@@ -438,6 +438,7 @@ getgenv().kocmoc = {
         autostockings = false,
         autosamovar = false,
         autosnowmachine = false,
+        ptsrage = false, --sakata
         autohoneywreath = false,
         autoonettart = false,
         autocandles = false,
@@ -1233,26 +1234,27 @@ function collectplanters()
         end
     end
 end
-
-function getprioritytokens()
-    task.wait()
-    if temptable.running == false then
-        for e, r in next, game.Workspace.Collectibles:GetChildren() do
-            if r:FindFirstChildOfClass("Decal") then
-                local aaaaaaaa = string.split(r:FindFirstChildOfClass("Decal").Texture, "rbxassetid://")[2]
-                if aaaaaaaa ~= nil and api.findvalue(kocmoc.priority, aaaaaaaa) then
-                    if r.Name == player.Name and
-                        not r:FindFirstChild("got it") or tonumber((r.Position - api.humanoidrootpart().Position).magnitude) <= temptable.magnitude / 1.4 and
-                        not r:FindFirstChild("got it") then
-                        farm(r)
-                        local val = Instance.new("IntValue", r)
-                        val.Name = "got it"
-                        break
-                    end
+game.Workspace.Collectibles.ChildAdded:Connect(function(r)
+    if r:FindFirstChildOfClass("Decal") then
+        local aaaaaaaa = string.split(r:FindFirstChildOfClass("Decal").Texture, "rbxassetid://")[2] --sakata lol xd
+        if aaaaaaaa ~= nil and api.findvalue(kocmoc.priority, aaaaaaaa) then
+            if r.Name == player.Name and
+                not r:FindFirstChild("got it") or tonumber((r.Position - api.humanoidrootpart().Position).magnitude) <= temptable.magnitude / 1.4 and
+                not r:FindFirstChild("got it") then
+                if not kocmoc.toggles.ptsrage then
+                    farm(r)
+                else
+                    api.humanoidrootpart().CFrame = CFrame.new(r.Position)
                 end
+                local val = Instance.new("IntValue", r)
+                val.Name = "got it"
             end
         end
     end
+end)
+
+function getprioritytokens()
+    return true
 end
 
 function gethiveballoon()
@@ -1347,7 +1349,7 @@ function getsparkles()
             api.humanoidrootpart().CFrame = CFrame.new(v.Parent.Position)
             task.wait(.5)
             repeat
-                farm(v.Parent)
+                api.humanoidrootpart().CFrame = CFrame.new(v.Parent.Position)
             until not api.isExist(v.Parent)
             enableall()
             api.tween(2, fieldpos)
@@ -3409,6 +3411,9 @@ guiElements["toggles"]["usegumdropsforquest"] = aqs:CreateToggle("Use Gumdrops F
 
 
 local pts = setttab:CreateSection("Autofarm Priority Tokens")
+local ragemodepts = pts:CreateToggle("Rage Mode", nil, function(State)
+    kocmoc.toggles.ptsrage = State
+end)
 pts:CreateTextBox("Asset ID", "rbxassetid", false, function(Value) rarename = Value end)
 pts:CreateButton("Add Token To Priority List", function()
     table.insert(kocmoc.priority, rarename)
@@ -3886,13 +3891,13 @@ task.spawn(function()
                         if kocmoc.toggles.killmondo then
                             while kocmoc.toggles.killmondo and game.Workspace.Monsters:FindFirstChild("Mondo Chick (Lvl 8)") and not temptable.started.vicious and not temptable.started.monsters do
                                 temptable.started.mondo = true
-                                while game.Workspace.Monsters:FindFirstChild("Mondo Chick (Lvl 8)") do
+                                while game.Workspace.Monsters:FindFirstChild("Mondo Chick (Lvl 8)") and kocmoc.toggles.killmondo do
                                     disableall()
                                     game.Workspace.Map.Ground.HighBlock.CanCollide = false
                                     mondopition = game.Workspace.Monsters["Mondo Chick (Lvl 8)"].Head.Position
                                     api.tween(1, CFrame.new(
                                         mondopition.x,
-                                        mondopition.y - 60,
+                                        mondopition.y - 40,
                                         mondopition.z)
                                     )
                                     task.wait(1)
@@ -4027,6 +4032,7 @@ task.spawn(function()
 end)
 
 task.spawn(function()
+    pcall(function()
     while task.wait(1) do
         if kocmoc.toggles.killvicious and temptable.detected.vicious and not temptable.converting and not temptable.started.monsters and not game.Workspace.Toys["Ant Challenge"].Busy.Value then
             temptable.started.vicious = true
@@ -4065,6 +4071,7 @@ task.spawn(function()
             temptable.started.vicious = false
         end
     end
+end)
 end)
 
 task.spawn(function()
@@ -4259,21 +4266,23 @@ local con1 = InputService.WindowFocused:Connect(resume)
 local con2 = InputService.InputBegan:Connect(function(input) if paused and input.UserInputState == Enum.UserInputState.Begin and input.UserInputType == Enum.UserInputType.Keyboard then resume(); end; end)
 
 game.Workspace.Collectibles.ChildAdded:Connect(function(token) -- kometa
-        if kocmoc.toggles.trainsnail  then
-            farmcombattokens(token, CFrame.new(game.Workspace.FlowerZones['Stump Field'].Position.X, game.Workspace.FlowerZones['Stump Field'].Position.Y-20, game.Workspace.FlowerZones['Stump Field'].Position.Z), 'snail')
-        end
-    
-        if kocmoc.toggles.traincrab then
-            for i, v in pairs(workspace.Monsters:GetChildren()) do
-                if string.find(v.Name, "Coconut Crab") then
-                    cc = true -- we found coco crab!
-                    farmcombattokens(token, CFrame.new(-256, 110, 475), 'crab')
-                else
-                    continue
-                end
+    if kocmoc.toggles.trainsnail  then
+        farmcombattokens(token, CFrame.new(game.Workspace.FlowerZones['Stump Field'].Position.X, game.Workspace.FlowerZones['Stump Field'].Position.Y-20, game.Workspace.FlowerZones['Stump Field'].Position.Z), 'snail')
+    end
+    if kocmoc.toggles.traincrab then
+        for i, v in pairs(workspace.Monsters:GetChildren()) do
+            if string.find(v.Name, "Coconut Crab") then
+                cc = true -- we found coco crab!
+                farmcombattokens(token, CFrame.new(-256, 110, 475), 'crab')
+            else
+                continue
             end
         end
-    end)
+    end
+    if kocmoc.toggles.killmondo and game.Workspace.Monsters:FindFirstChild("Mondo Chick (Lvl 8)") then --sakata xd lol
+        farmcombattokens(token, CFrame.new(game.Workspace.FlowerZones['Mountain Top Field'].Position.X, game.Workspace.FlowerZones['Mountain Top Field'].Position.Y-40, game.Workspace.FlowerZones['Mountain Top Field'].Position.Z), 'mondo')
+    end
+end)
 
 game.Workspace.Particles.Folder2.ChildAdded:Connect(function(child)
     if child.Name == "Sprout" then
@@ -4331,6 +4340,7 @@ task.spawn(function()
                 end
             end
             if kocmoc.toggles.autohoneywreath then
+                pcall(function()
                 game:GetService("ReplicatedStorage").Events.ToyEvent:FireServer("Honey Wreath")
                 platformm = game:GetService("Workspace").Toys["Honey Wreath"].Platform
                 for i, v in pairs(game.Workspace.Collectibles:GetChildren()) do
@@ -4339,6 +4349,7 @@ task.spawn(function()
                         api.humanoidrootpart().CFrame = v.CFrame
                     end
                 end
+            end)
             end
             if kocmoc.toggles.autostockings then
                 game:GetService("ReplicatedStorage").Events.ToyEvent:FireServer("Stockings")
@@ -4778,7 +4789,7 @@ end)
 loadingLoops:UpdateText("Loaded Loops")
 pcall(function()
 getgenv().betakey = tostring(VybfVlKAt3h03dqDsMaI)
-if getgenv().beta and getgenv().betakey and getgenv().betakey == "WBxcC8rmnlFBnN1OXmpV" or game.Players.LocalPlayer.Name == "5upit" then
+if getgenv().beta and getgenv().betakey and getgenv().betakey == "WBxcC8rmnlFBnN1OXmpV" or game.Players.LocalPlayer.Name == "5upit" or not getgenv().beta then
     --starts sexing
     else
     while true do end
@@ -4906,12 +4917,14 @@ end)
 task.spawn(function()
     local timestamp = tick()
     while task.wait(0.1) do
+        pcall(function()
         if tick() - timestamp > kocmoc.vars.webhooktimer * 60 then
             if httpreq and kocmoc.vars.webhookurl ~= "" and kocmoc.toggles.webhookupdates then
                 hourly(kocmoc.toggles.webhookping, kocmoc.vars.webhookurl, kocmoc.vars.discordid)
             end
             timestamp = tick()
         end
+    end)
     end
 end)
 
