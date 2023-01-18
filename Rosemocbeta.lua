@@ -6,7 +6,10 @@ getgenv().Star = "⭐"
 getgenv().Danger = "⚠️"
 getgenv().ExploitSpecific = "📜"
 getgenv().Beesmas = "🎄"
-getgenv().beta = isbeta or true
+getgenv().beta = isbeta or false
+
+autoload = getgenv().autoload
+loadRecent = getgenv().loadRecent
 
 --[[
 local Identify_ = math.random(54254252) -- Sakata
@@ -102,7 +105,7 @@ for _, v in pairs(game:GetService("CoreGui"):GetDescendants()) do
 end
 
 getgenv().temptable = {
-    version = "1.2.1a",
+    version = "1.3.1b",
     blackfield = "Sunflower Field",
     redfields = {},
     bluefields = {},
@@ -122,7 +125,8 @@ getgenv().temptable = {
         ant = false,
         monsters = false,
         commando = false,
-        crab = false
+        crab = false,
+        snowbear = false
     },
     detected = {vicious = false, windy = false},
     tokensfarm = false,
@@ -147,7 +151,8 @@ getgenv().temptable = {
         killmondo = false,
         vicious = false,
         windy = false,
-        commando = false
+        commando = false,
+        snowbear = false
     },
     allplanters = {},
     planters = {
@@ -311,8 +316,8 @@ local buffTable = {
     ["Glue"] = {b = false, DecalID = "2504978518"},
     ["Glitter"] = {b = false, DecalID = "2542899798"},
     ["Tropical Drink"] = {b = false, DecalID = "3835877932"},
-    ["Super Smoothie"] = {b = false, DecalID = "5144657215"},
-    ["Purple Potion"] = {b = false, DecalID = "4935580187"},
+    ["Super Smoothie"] = {b = false, DecalID = "5144657109"},
+    ["Purple Potion"] = {b = false, DecalID = "4935580111"},
     ["Stinger"] = {b = false, DecalID = "2314214749"}
 }
 local AccessoryTypes = require(game:GetService("ReplicatedStorage").Accessories).GetTypes()
@@ -443,6 +448,7 @@ getgenv().kocmoc = {
         autosnowmachine = false,
         sproutsummoner = false, --zvaq
         ptsrage = false, --sakata
+        trainsnow = false,
         autohoneywreath = false,
         autoonettart = false,
         autocandles = false,
@@ -456,6 +462,7 @@ getgenv().kocmoc = {
         autodonate = false,
         farmdigital = false,
         autouseconvertors = false,
+        autousemicro = false,
         honeymaskconv = false,
         resetbeenergy = false,
         enablestatuspanel = false,
@@ -811,6 +818,10 @@ function disableall()
     if kocmoc.toggles.traincommando and not temptable.started.commando then
         kocmoc.toggles.commando = false
         temptable.cache.commando = true
+    end
+    if kocmoc.toggles.trainsnow and not temptable.started.snowbear then
+        kocmoc.toggles.trainsnow = false
+        temptable.cache.snowbear = true
     end
 end
 
@@ -1340,15 +1351,8 @@ end
 function getfireflies()
     for i,v in next, game:GetService("Workspace").NPCBees:GetChildren() do
         if v.Name == "Firefly" then
-            disableall()
             api.humanoidrootpart().CFrame = CFrame.new(v.Position)
-            task.wait(.5)
-            repeat
-                farm(v)
-            until not api.isExist(v)
-            enableall()
-            api.tween(2, fieldpos)
-        else 
+        else
             continue
         end
     end
@@ -1503,7 +1507,7 @@ function farmcombattokens(v, pos, type)
     elseif type == 'mondo' then
         if temptable.MondoCollectTokens then return end
         if v.CFrame.YVector.Y == 1 and v.Transparency == 0 and v ~= nil and v.Parent ~= nil then
-            if (v.Position - pos.Position).Magnitude < 25 then
+            if (v.Position - pos.Position).Magnitude < 100 then
                 repeat
                     task.wait()
                     api.humanoidrootpart().CFrame = CFrame.new(v.Position)
@@ -1512,6 +1516,17 @@ function farmcombattokens(v, pos, type)
             end
         end
     elseif type == 'commando' then
+    if temptable.MondoCollectTokens then return end
+        if v.CFrame.YVector.Y == 1 and v.Transparency == 0 and v ~= nil and v.Parent ~= nil then
+            if (v.Position - pos.Position).Magnitude < 25 and v.Parent and v then
+                repeat
+                    task.wait()
+                    api.humanoidrootpart().CFrame = CFrame.new(v.Position)
+                until not v.Parent or v.CFrame.YVector.Y ~= 1 or not v
+                api.teleport(pos)
+            end
+        end
+    elseif type == 'snowbear' then
     if temptable.MondoCollectTokens then return end
         if v.CFrame.YVector.Y == 1 and v.Transparency == 0 and v ~= nil and v.Parent ~= nil then
             if (v.Position - pos.Position).Magnitude < 25 and v.Parent and v then
@@ -2298,6 +2313,7 @@ end):AddToolTip("It will copy the Discord link to your clipboard!")
 information:CreateButton("Donation", function()
     setclipboard("https://www.paypal.com/paypalme/oranginabss")
 end)
+--[[
 guiElements["toggles"]["enablestatuspanel"] = information:CreateToggle("Status Panel", true, function(bool)
     kocmoc.toggles.enablestatuspanel = bool
     for _,v in pairs(game:GetService("CoreGui"):GetDescendants()) do
@@ -2306,7 +2322,7 @@ guiElements["toggles"]["enablestatuspanel"] = information:CreateToggle("Status P
             v.Visible = bool
         end
     end
-end)
+end)]]
 
 local disableenable = hometab:CreateSection("Disable all or Enable all")
 disableenable:CreateButton("Disable All Functions", function()
@@ -2341,6 +2357,9 @@ guiElements["toggles"]["disableconversion"] = contt:CreateToggle("Don't Convert 
 end)
 guiElements["toggles"]["autouseconvertors"] = contt:CreateToggle("Auto Bag Reduction", nil, function(Boole)
     kocmoc.toggles.autouseconvertors = Boole
+end)
+guiElements["toggles"]["automicro"] = contt:CreateToggle("Auto Use Micro", nil, function(State)
+    kocmoc.toggles.autousemicro = State
 end)
 guiElements["vars"]["autouseMode"] = contt:CreateDropdown("Bag Reduction Mode", {
     "Ticket Converters", "Just Snowflakes", "Just Coconuts",
@@ -2430,7 +2449,7 @@ guiElements["toggles"]["tackyplanter"] = plantersection:CreateToggle("Blacklist 
 guiElements["toggles"]["pesticideplanter"] = plantersection:CreateToggle("Blacklist Pesticide Planter", nil, function(State) kocmoc.toggles.pesticideplanter = State end)
 guiElements["toggles"]["petalplanter"] = plantersection:CreateToggle("Blacklist Petal Planter", nil, function(State) kocmoc.toggles.petalplanter = State end)
 
-local customplanterssection = plantertab:CreateSection("Custom Planters")
+--[[ local customplanterssection = plantertab:CreateSection("Custom Planters")
 customplanterssection:CreateLabel("Turning this on will disable auto planters!")
 customplanterssection:CreateLabel("["..Danger.."] You should know what you are")
 customplanterssection:CreateLabel("doing before turning this on! ["..Danger.."]")
@@ -2575,10 +2594,11 @@ guiElements["vars"]["customplanter35"] = customplanter3section:CreateDropdown("F
 end)
 guiElements["vars"]["customplanterdelay35"] = customplanter3section:CreateSlider("Field 5 Harvest %", 0, 100, 75, false, function(Value)
     kocmoc.vars.customplanterdelay35 = Value
-end)
+end) ]]
 
 local mobkill = combtab:CreateSection("Combat")
-guiElements["toggles"]["traincommando"] = mobkill:CreateToggle("Train Commando", nil, function(State) kocmoc.toggles.traincommando = State end)
+guiElements["toggles"]["traincommando"] = mobkill:CreateToggle("Train Commando Chick", nil, function(State) kocmoc.toggles.traincommando = State end)
+--guiElements["toggles"]["trainsnowbear"] = mobkill:CreateToggle("Train Snow Bear", nil, function(State) kocmoc.toggles.trainsnow = State end) --Snow Train Sakata
 mobkill:CreateToggle("Train Crab", nil, function(State)
     if State then
         api.teleport(CFrame.new(-375, 110, 535))
@@ -3441,7 +3461,7 @@ guiElements["toggles"]["usegumdropsforquest"] = aqs:CreateToggle("Use Gumdrops F
 
 
 local pts = setttab:CreateSection("Autofarm Priority Tokens")
-local ragemodepts = pts:CreateToggle("Rage Mode", nil, function(State)
+local ragemodepts = pts:CreateToggle("Rage Mode ["..Danger.."]", nil, function(State)
     kocmoc.toggles.ptsrage = State
 end)
 pts:CreateTextBox("Asset ID", "rbxassetid", false, function(Value) rarename = Value end)
@@ -3586,6 +3606,11 @@ game.Workspace.Particles.ChildAdded:Connect(function(v)
     end
 end)
 
+local UseMicro = function(...)
+    pcall(function()
+        game:GetService("ReplicatedStorage").Events.PlayerActivesCommand:FireServer({["Name"] = "Micro-Converter"})
+    end)
+end
 -- Auto Digital Bee
 
 --[[ game.Workspace.Camera.DupedTokens.ChildAdded:Connect(function(v)
@@ -3606,7 +3631,20 @@ task.spawn(function()
             local pollencount = player.CoreStats.Pollen.Value
             temptable.pollenpercentage = pollencount / maxpollen * 100
             fieldselected = game.Workspace.FlowerZones[kocmoc.vars.field]
-
+            if kocmoc.toggles.autousemicro then
+                if tonumber(temptable.pollenpercentage) >= (kocmoc.vars.convertat - (kocmoc.vars.autoconvertWaitTime)) then
+                    if not temptable.consideringautoconverting then
+                        temptable.consideringautoconverting = true
+                        task.spawn(function()
+                            task.wait(kocmoc.vars.autoconvertWaitTime)
+                            if tonumber(temptable.pollenpercentage) >= (kocmoc.vars.convertat - (kocmoc.vars.autoconvertWaitTime)) then
+                                UseMicro()
+                            end
+                            temptable.consideringautoconverting = false
+                        end)
+                    end
+                end
+            end
             if kocmoc.toggles.autouseconvertors then
                 if tonumber(temptable.pollenpercentage) >= (kocmoc.vars.convertat - (kocmoc.vars.autoconvertWaitTime)) then
                     if not temptable.consideringautoconverting then
@@ -4301,6 +4339,14 @@ local findcommando = function()
     end
 end
 
+local findsnow = function()
+    for i, v in ipairs(workspace.Monsters:GetChildren()) do
+        if v.Name:find('Snow') then
+            return true
+        end
+    end
+end
+
 game.Workspace.Collectibles.ChildAdded:Connect(function(token) -- kometa
     if kocmoc.toggles.trainsnail  then
         farmcombattokens(token, CFrame.new(game.Workspace.FlowerZones['Stump Field'].Position.X, game.Workspace.FlowerZones['Stump Field'].Position.Y-20, game.Workspace.FlowerZones['Stump Field'].Position.Z), 'snail')
@@ -4320,6 +4366,9 @@ game.Workspace.Collectibles.ChildAdded:Connect(function(token) -- kometa
     end
     if kocmoc.toggles.traincommando and findcommando() then
         farmcombattokens(token, CFrame.new(api.humanoidrootpart().Position), 'commando')
+    end
+    if kocmoc.toggles.trainsnow and findsnow() then
+        farmcombattokens(token, CFrame.new(api.humanoidrootpart().Position), 'snowbear')
     end
 end)
 
@@ -4553,10 +4602,19 @@ game:GetService("RunService").Heartbeat:connect(function()
         floatpad.CanCollide = false
     end
 end)
+if syn then
+    for i,v in pairs(getconnections(game.Players.LocalPlayer.Idled)) do
+        v:Disable()
+    end
+    else
+        local vu = game:GetService("VirtualUser")
+    game:GetService("Players").LocalPlayer.Idled:connect(function()
+       vu:Button2Down(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+       wait(1)
+       vu:Button2Up(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+    end)
+    end
 
-for i,v in pairs(getconnections(game.Players.LocalPlayer.Idled)) do
-    v:Disable()
-end
 
 local canTeleport = true
 game:GetService("Workspace").Particles.Snowflakes.ChildAdded:Connect(function(snowflake)
@@ -4911,14 +4969,16 @@ local function fetchVisualMonsterString(v)
 end
 
 local function getToyCooldown(toy)
+    pcall(function()
     local c = require(game.ReplicatedStorage.ClientStatCache):Get()
     local name = toy
     local t = workspace.OsTime.Value - c.ToyTimes[name]
     local cooldown = workspace.Toys[name].Cooldown.Value
     local u = cooldown - t
     local canBeUsed = false
-    if string.find(tostring(u), "-") then canBeUsed = true end
-    return u, canBeUsed
+    if string.find(tostring(u),"-") then canBeUsed = true end
+    return u,canBeUsed
+    end)
 end
 
 
@@ -5021,35 +5081,87 @@ task.spawn(function() -- Commando Sakata
             end
         end
 end)
+--[[
+local snowbearspawn = false
+task.spawn(function() -- Snow bear Sakata
+        while task.wait(1) do
+            if kocmoc.toggles.trainsnow and findsnow() ~= true then
+                temptable.float = false
+            end
+            if kocmoc.toggles.trainsnow and not monsterspawners["Commando Chick"].Attachment.TimerGui.TimerLabel.Visible and not temptable.converting and not temptable.started.monsters and not game.Workspace.Toys["Ant Challenge"].Busy.Value then
+                temptable.started.snowbear = true
+                disableall()
+                --if not commandospawn then
+                for i, v in next, game.workspace.Monsters:GetChildren() do
+                    if string.find(v.Name, "Snow") then
+                        snowbearspawn = true
+                    else
+                        snowbearspawn = false
+                    end
+                end
+                if snowbearspawn == false then
+                    pcall(function()
+                    api.humanoidrootpart().CFrame = CFrame.new(game:GetService("Workspace").Toys.Snowbear.Platform.Position.X, game:GetService("Workspace").Toys.Snowbear.Platform.Position.Y + 5, game:GetService("Workspace").Toys.Snowbear.Platform.Position.Z)
+                    task.wait(0.4)
+                    firesignal(game:GetService("Players").LocalPlayer.PlayerGui.ScreenGui.ActivateButton.MouseButton1Click)
+                    end)
+                    task.wait(0.5)
+                end
+                for i, v in next, game.workspace.Monsters:GetChildren() do
+                    for x in string.gmatch(v.Name, "Snow") do
+                        while kocmoc.toggles.trainsnow and snowbearspawn == true do
+                            task.wait()
+                            if string.find(v.Name, "Snow") then
+                                snowbearspawn = true
+                                for i = 1, 4 do
+                                    temptable.float = true
+                                    if v:FindFirstChild('HumanoidRootPart') then
+                                        api.humanoidrootpart().CFrame = CFrame.new(v.HumanoidRootPart.Position.x, v.HumanoidRootPart.Position.y+30, v.HumanoidRootPart.Position.z)
+                                    end
+                                    task.wait(.1)
+                                end
+                                else
+                                    temptable.float = false
+                            end
+                        end
+                    end
+                end
+                enableall()
+                task.wait(1)
+                temptable.float = false
+                temptable.started.snowbear = false
+            end
+        end
+end)]]
     
 
 task.spawn(function()
+    loadingInfo:CreateLabel("")
+    loadingInfo:CreateLabel("Script loaded!")
+    task.wait(2)
     pcall(function()
-        loadingInfo:CreateLabel("")
-        loadingInfo:CreateLabel("Script loaded!")
-        task.wait(2)
-        pcall(function()
-            for i, v in pairs(game.CoreGui:GetDescendants()) do
-                if v.Name == "Startup Section" then
-                    v.Parent.Parent.RightSide["Information Section"].Parent = v.Parent
-                    v:Destroy()
-                end
-            end
-        end)
-        local panel = hometab:CreateSection("Mob Panel")
-        local statusTable = {}
-        for i, v in pairs(monsterspawners:GetChildren()) do
-            if not string.find(v.Name, "CaveMonster") then
-                local mobText = nil
-                mobText = fetchVisualMonsterString(v)
-                if mobText ~= nil then
-                    local mob = panel:CreateButton(mobText, function()
-                        api.tween(1, CFrame.new(getNearestField(v)))
-                    end)
-                    table.insert(statusTable, {mob, v})
-                end
+        for i, v in pairs(game.CoreGui:GetDescendants()) do
+            if v.Name == "Startup Section" then
+                v.Parent.Parent.RightSide["Information Section"].Parent = v.Parent
+                v:Destroy()
             end
         end
+    end)
+    --[[
+    local panel = hometab:CreateSection("Mob Panel")
+    local statusTable = {}
+    for i, v in pairs(monsterspawners:GetChildren()) do
+        if not string.find(v.Name, "CaveMonster") then
+            local mobText = nil
+            mobText = fetchVisualMonsterString(v)
+            if mobText ~= nil then
+                local mob = panel:CreateButton(mobText, function()
+                    api.tween(1, CFrame.new(getNearestField(v)))
+                end)
+                table.insert(statusTable, {mob, v})
+            end
+        end
+    end
         local mob2 = panel:CreateButton("Mondo Chick: 00:00", function()
             api.tween(1,
                       game.Workspace.FlowerZones["Mountain Top Field"]
@@ -5118,29 +5230,9 @@ task.spawn(function()
         local mmsUpd = panel2:CreateButton("Mythic Meteor Shower: 00:00", function()
             api.tween(1, CFrame.new( game.Workspace.Toys["Mythic Meteor Shower"].Platform.Position + Vector3.new(0, 5, 0)))
         end)
-        
-        local utilities = {
-            ["Sprout Summoner"] = ssUpd,
-            ["Red Field Booster"] = rfbUpd,
-            ["Blue Field Booster"] = bfbUpd,
-            ["Field Booster"] = wfbUpd,
-            ["Coconut Dispenser"] = cocoDispUpd,
-            ["Instant Converter"] = ic1,
-            ["Instant Converter B"] = ic2,
-            ["Instant Converter C"] = ic3,
-            ["Wealth Clock"] = wcUpd,
-            ["Mythic Meteor Shower"] = mmsUpd,
-            ["Honey Wreath"] = hwUpd,
-            ["Snow Machine"] = smUpd,
-            ["Gingerbread House"] = gbUpd,
-            ["Samovar"] = smvrUpd,
-            ["Honeyday Candles"] = hcUpd,
-            ["Beesmas Feast"] = bfUpd,
-            ["Onett's Lid Art"] = olaUpd
-        }
 
         local panel3 = hometab:CreateSection("Beesmas Panel ["..Beesmas.."]")
-        local hwUpd = panel2:CreateButton("Honey Wreath: 00:00", function()
+        local hwUpd = panel3:CreateButton("Honey Wreath: 00:00", function()
             api.tween(1, CFrame.new( game.Workspace.Toys["Honey Wreath"].Platform.Position + Vector3.new(0, 5, 0)))
         end)
         local smUpd = panel3:CreateButton("Snow Machine: 00:00", function()
@@ -5161,6 +5253,25 @@ task.spawn(function()
         local olaUpd = panel3:CreateButton("Onett's Lid Art: 00:00", function()
             api.tween(1, CFrame.new( game.Workspace.Toys["Onett's Lid Art"].Platform.Position + Vector3.new(0, 5, 0)))
         end)
+        local utilities = {
+            ["Sprout Summoner"] = ssUpd,
+            ["Red Field Booster"] = rfbUpd,
+            ["Blue Field Booster"] = bfbUpd,
+            ["Field Booster"] = wfbUpd,
+            ["Coconut Dispenser"] = cocoDispUpd,
+            ["Instant Converter"] = ic1,
+            ["Instant Converter B"] = ic2,
+            ["Instant Converter C"] = ic3,
+            ["Wealth Clock"] = wcUpd,
+            ["Mythic Meteor Shower"] = mmsUpd,
+            ["Honey Wreath"] = hwUpd,
+            ["Snow Machine"] = smUpd,
+            ["Gingerbread House"] = gbUpd,
+            ["Samovar"] = smvrUpd,
+            ["Honeyday Candles"] = hcUpd,
+            ["Beesmas Feast"] = bfUpd,
+            ["Onett's Lid Art"] = olaUpd
+        }
         while task.wait(1) do
             if kocmoc.toggles.enablestatuspanel then
                 for i, v in pairs(statusTable) do
@@ -5202,8 +5313,7 @@ task.spawn(function()
                     end
                 end
             end
-        end
-    end)
+        end]]
 end)
 
 if loadRecent and isfile('kocmoc/recent.json') then
@@ -5431,3 +5541,4 @@ end
 end
 
 return OranginaBeta
+
